@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="LaptopMate 懂电脑：面向电脑小白的笔记本电脑选购助手，本地静态版。">
+  <title>LaptopMate 懂电脑 · 笔记本选购助手</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-kicker">LaptopMate · 懂电脑</div>
+      <h1>用 1 分钟，找到适合你的笔记本</h1>
+      <p>填写预算和用途，先看简洁推荐；想看依据时再展开。所有计算在浏览器本地完成，不需要服务器。</p>
+      <div class="chips">
+        <span>20 条真实配置</span>
+        <span>5 个使用场景</span>
+        <span>先筛选，再评分</span>
+        <span>推荐理由可追溯</span>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="panel form-panel">
+        <h2>告诉我你的需求</h2>
+        <p class="muted small">30 秒填写，随时可以修改。</p>
+        <form id="profile-form" novalidate>
+          <div class="field-row">
+            <label class="field">
+              <span>预算下限（元）</span>
+              <input id="budget-min" type="number" min="0" max="100000" step="500" value="5000">
+            </label>
+            <label class="field">
+              <span>预算上限（元）</span>
+              <input id="budget-max" type="number" min="500" max="100000" step="500" value="10000">
+            </label>
+          </div>
+
+          <label class="field">
+            <span>主要使用场景</span>
+            <select id="scenario">
+              <option value="office">日常办公与网页浏览</option>
+              <option value="study">大学生学习</option>
+              <option value="programming" selected>Python 编程与数据分析</option>
+              <option value="gaming">游戏娱乐</option>
+              <option value="video">视频剪辑与图像处理</option>
+            </select>
+          </label>
+
+          <p class="field-label">重视程度（1 = 不重要，5 = 很重要）</p>
+          <label class="range-field">
+            <span>性能（CPU/GPU） <output id="performance-output">3</output></span>
+            <input id="performance" type="range" min="1" max="5" step="1" value="3">
+          </label>
+          <label class="range-field">
+            <span>续航 <output id="battery-output">4</output></span>
+            <input id="battery" type="range" min="1" max="5" step="1" value="4">
+          </label>
+          <label class="range-field">
+            <span>便携 <output id="portability-output">3</output></span>
+            <input id="portability" type="range" min="1" max="5" step="1" value="3">
+          </label>
+
+          <details class="optional">
+            <summary>更多偏好（可选）</summary>
+            <div class="optional-body">
+              <label class="field">
+                <span>重量上限（kg，0 = 不限制）</span>
+                <input id="weight-limit" type="number" min="0" max="5" step="0.1" value="0">
+              </label>
+              <label class="field">
+                <span>内存最低要求</span>
+                <select id="ram-min">
+                  <option value="">无要求</option>
+                  <option value="8">8GB</option>
+                  <option value="16">16GB</option>
+                  <option value="32">32GB</option>
+                  <option value="64">64GB</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>独立显卡</span>
+                <select id="dgpu">
+                  <option value="">无偏好</option>
+                  <option value="required">必须独显</option>
+                  <option value="not-required">不需要（不强制）</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>屏幕尺寸偏好</span>
+                <select id="screen-pref">
+                  <option value="">无偏好</option>
+                  <option value="13-14">13–14 英寸</option>
+                  <option value="15-16">15–16 英寸</option>
+                  <option value="16+">16 英寸以上</option>
+                </select>
+              </label>
+              <fieldset class="brands">
+                <legend>品牌偏好（软偏好，不排除其他品牌）</legend>
+                <label><input type="checkbox" name="brand" value="Apple"> Apple</label>
+                <label><input type="checkbox" name="brand" value="Lenovo"> Lenovo</label>
+                <label><input type="checkbox" name="brand" value="HP"> HP</label>
+                <label><input type="checkbox" name="brand" value="Dell"> Dell</label>
+                <label><input type="checkbox" name="brand" value="ASUS"> ASUS</label>
+                <label><input type="checkbox" name="brand" value="Xiaomi"> Xiaomi</label>
+                <label><input type="checkbox" name="brand" value="Honor"> Honor</label>
+                <label><input type="checkbox" name="brand" value="MSI"> MSI</label>
+              </fieldset>
+            </div>
+          </details>
+
+          <div class="form-actions">
+            <button class="btn primary" type="submit">生成推荐</button>
+            <button class="btn ghost" type="button" id="reset-button">重置问卷</button>
+          </div>
+          <p id="form-error" class="form-error" role="alert" hidden></p>
+          <p class="hint">数据：20 条真实配置 · 5 台 MacBook / 15 台 Windows</p>
+          <p class="hint">价格与配置会变化；购买前请重新核价并核对具体配置。</p>
+        </form>
+      </aside>
+
+      <main class="content">
+        <nav class="tabs" role="tablist" aria-label="LaptopMate 页面">
+          <button class="tab active" type="button" data-tab="results" role="tab" aria-selected="true">推荐</button>
+          <button class="tab" type="button" data-tab="details" role="tab" aria-selected="false">详情</button>
+          <button class="tab" type="button" data-tab="compare" role="tab" aria-selected="false">对比</button>
+          <button class="tab" type="button" data-tab="knowledge" role="tab" aria-selected="false">选购知识</button>
+        </nav>
+
+        <section id="tab-results" class="tab-panel active" role="tabpanel">
+          <div id="welcome">
+            <div class="summary-bar">
+              <strong>从左侧开始。</strong> 填写预算和用途，点击「生成推荐」，先看 3 个简洁推荐；需要依据时再展开。
+            </div>
+            <div class="steps">
+              <div><strong>1. 预算 + 用途</strong><p>选择预算范围、主要场景和重视程度。</p></div>
+              <div><strong>2. 看推荐</strong><p>每条先给价格、匹配分和关键配置。</p></div>
+              <div><strong>3. 按需展开</strong><p>评分明细、推荐理由和来源都放在展开项里。</p></div>
+            </div>
+            <p class="muted small" id="welcome-data-note">当前数据：20 条真实配置 · 核验日期 2026-10-22。</p>
+          </div>
+          <div id="results-content" hidden></div>
+        </section>
+
+        <section id="tab-details" class="tab-panel" role="tabpanel" hidden>
+          <h2>产品详情与参数解释</h2>
+          <label class="field compact-field">
+            <span>选择一台电脑</span>
+            <select id="detail-select"></select>
+          </label>
+          <div id="detail-content"></div>
+          <details class="knowledge-box">
+            <summary>参数小课堂：这些参数实际影响什么？</summary>
+            <ul>
+              <li><strong>CPU</strong>：影响通用计算、编译、数据处理和多任务能力。不同功耗下的同一型号也可能有差异。</li>
+              <li><strong>GPU</strong>：影响游戏、图形渲染和部分并行计算。集成显卡也能办公和看视频，但大型游戏/渲染通常需要独显。</li>
+              <li><strong>RAM</strong>：影响同时打开多少程序、处理多大的数据集。16GB 适合多数学习/办公，32GB 更适合大型项目。</li>
+              <li><strong>SSD</strong>：影响可用空间和文件读写体验。容量之外，还要关注接口和实际读写速度。</li>
+              <li><strong>屏幕</strong>：分辨率影响细腻度，刷新率影响滚动/游戏流畅度，亮度影响户外可视性，色域影响创作色彩。</li>
+              <li><strong>重量</strong>：影响日常携带。标称重量通常不含电源适配器。</li>
+              <li><strong>电池容量（Wh）</strong>：只是续航的影响因素之一；屏幕、芯片功耗、系统和使用方式同样重要，不能仅凭 Wh 断言续航更长。</li>
+            </ul>
+          </details>
+        </section>
+
+        <section id="tab-compare" class="tab-panel" role="tabpanel" hidden>
+          <h2>机型对比（2–10 台）</h2>
+          <p class="muted small">按住 Ctrl（Mac 为 Command）多选 2–10 台；对比表可横向滚动。</p>
+          <label class="field compact-field">
+            <span>选择 2–10 台电脑</span>
+            <select id="compare-select" multiple size="9"></select>
+          </label>
+          <div id="compare-content"></div>
+        </section>
+
+        <section id="tab-knowledge" class="tab-panel" role="tabpanel" hidden>
+          <h2>选购知识</h2>
+          <p class="muted">不需要先看；遇到不懂的参数再展开查。</p>
+          <details class="knowledge-box"><summary>CPU 和 GPU</summary><p>CPU 主要影响通用计算、编译、多任务和数据处理；GPU 主要影响游戏、图形渲染和部分并行计算。同一型号在不同功耗和散热下也可能有差异，不能只看名字。</p></details>
+          <details class="knowledge-box"><summary>内存和硬盘</summary><p>内存影响同时打开多少程序、能处理多大的数据集；16GB 适合多数学习/办公，32GB 更适合大型项目。SSD 影响可用空间和文件读写体验，容量之外也要关注接口和实际速度。</p></details>
+          <details class="knowledge-box"><summary>屏幕</summary><p>分辨率影响细腻度，刷新率影响滚动和游戏流畅度，亮度影响户外可视性，色域影响创作色彩。这些指标比“屏幕尺寸”更能说明实际体验。</p></details>
+          <details class="knowledge-box"><summary>重量和续航</summary><p>重量影响日常携带，标称重量通常不含电源适配器。电池容量 Wh 只是续航的影响因素之一，不能单独代表实际续航；芯片功耗、屏幕、系统和使用方式都会影响续航。</p></details>
+          <details class="knowledge-box"><summary>评分和置信度怎么理解</summary><p>总分是当前需求下的相对匹配分，不是性能绝对分或购买概率。权重由场景默认值 × 你的重视程度调整后归一化。缺失的非关键字段使用中性 50 分并降低置信度；缺失关键字段会进入“信息不足”。CPU/GPU 使用组件参考分时置信度为中；游戏场景的散热/性能释放使用 GPU TGP 代理。</p></details>
+          <details class="knowledge-box"><summary>不同场景的默认权重</summary><div id="weights-table"></div></details>
+        </section>
+
+        <footer class="footer-note">
+          LaptopMate 是选购决策辅助工具，不是电商平台。推荐结果是基于当前数据和规则的相对排序，不是购买保证。
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
